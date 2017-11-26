@@ -36,6 +36,7 @@ yarn add @ladjs/proxy
 ## Usage
 
 ```js
+#!/usr/bin/env node
 const proxy = require('@ladjs/proxy');
 
 if (!module.parent) proxy.listen(80);
