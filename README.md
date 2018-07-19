@@ -39,7 +39,7 @@ yarn add @ladjs/proxy
 #!/usr/bin/env node
 const proxy = require('@ladjs/proxy');
 
-proxy.listen(80);
+proxy.listen('127.0.0.1', 80);
 ```
 
 
@@ -55,7 +55,7 @@ proxy.listen(80);
 [MIT](LICENSE) © [Nick Baugh](http://niftylettuce.com/)
 
 
-## 
+##
 
 [npm]: https://www.npmjs.com/
 
