@@ -35,12 +35,7 @@ yarn add @ladjs/proxy
 
 ## Usage
 
-```js
-#!/usr/bin/env node
-const proxy = require('@ladjs/proxy');
-
-proxy.listen('127.0.0.1', 80);
-```
+See <https://github.com/ladjs/lad/blob/master/template/proxy.js> for the most up to date usage example.
 
 
 ## Contributors
@@ -55,7 +50,7 @@ proxy.listen('127.0.0.1', 80);
 [MIT](LICENSE) © [Nick Baugh](http://niftylettuce.com/)
 
 
-##
+## 
 
 [npm]: https://www.npmjs.com/
 
