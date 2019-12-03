@@ -15,6 +15,9 @@ class ProxyServer {
         name: process.env.CERTBOT_WELL_KNOWN_NAME || null,
         contents: process.env.CERTBOT_WELL_KNOWN_CONTENTS || null
       },
+      // useful option if you don't need https redirect
+      // (e.g. it's just a certbot server)
+      redirect: true,
       ...config
     };
 
@@ -34,12 +37,13 @@ class ProxyServer {
         }
       );
 
-    router.use((req, res) => {
-      res.writeHead(301, {
-        Location: parse(`https://${req.headers.host}${req.url}`).href
+    if (this.config.redirect)
+      router.use((req, res) => {
+        res.writeHead(301, {
+          Location: parse(`https://${req.headers.host}${req.url}`).href
+        });
+        res.end();
       });
-      res.end();
-    });
 
     this.server = http.createServer((req, res) => {
       router(req, res, finalhandler(req, res));

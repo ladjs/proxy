@@ -3,6 +3,13 @@ const request = require('supertest');
 
 const ProxyServer = require('..');
 
+test('starts and stops server', async t => {
+  const proxy = new ProxyServer();
+  await proxy.listen();
+  await proxy.close();
+  t.pass();
+});
+
 test('redirects http to https', async t => {
   const proxy = new ProxyServer();
   await proxy.listen();
@@ -10,6 +17,13 @@ test('redirects http to https', async t => {
   const { port } = proxy.server.address();
   t.is(res.status, 301);
   t.is(res.headers.location, `https://127.0.0.1:${port}/foobar`);
+});
+
+test('does not redirect http to https', async t => {
+  const proxy = new ProxyServer({ redirect: false });
+  await proxy.listen();
+  const res = await request(proxy.server).get('/foobar');
+  t.is(res.status, 404);
 });
 
 test('serves acme challenge', async t => {
