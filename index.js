@@ -44,6 +44,10 @@ class ProxyServer {
         });
         res.end();
       });
+    else
+      router.use((req, res) => {
+        res.end();
+      });
 
     this.server = http.createServer((req, res) => {
       router(req, res, finalhandler(req, res));

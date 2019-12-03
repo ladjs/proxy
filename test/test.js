@@ -23,7 +23,7 @@ test('does not redirect http to https', async t => {
   const proxy = new ProxyServer({ redirect: false });
   await proxy.listen();
   const res = await request(proxy.server).get('/foobar');
-  t.is(res.status, 404);
+  t.is(res.status, 200);
 });
 
 test('serves acme challenge', async t => {
