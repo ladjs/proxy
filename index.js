@@ -15,6 +15,7 @@ class ProxyServer {
         name: process.env.CERTBOT_WELL_KNOWN_NAME || null,
         contents: process.env.CERTBOT_WELL_KNOWN_CONTENTS || null
       },
+      removeWwwPrefix: true,
       // useful option if you don't need https redirect
       // (e.g. it's just a certbot server)
       redirect: true,
@@ -39,6 +40,8 @@ class ProxyServer {
 
     if (this.config.redirect)
       router.use((req, res) => {
+        if (this.config.removeWwwPrefix)
+          req.headers.host = req.headers.host.replace('www.', '');
         res.writeHead(301, {
           Location: parse(`https://${req.headers.host}${req.url}`).href
         });
