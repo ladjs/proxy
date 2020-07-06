@@ -5,6 +5,10 @@ const Router = require('router');
 const _ = require('lodash');
 const finalhandler = require('finalhandler');
 const parse = require('url-parse');
+const proxyWrap = require('findhit-proxywrap');
+const { boolean } = require('boolean');
+
+const proxiedHttp = proxyWrap.proxy(http);
 
 class ProxyServer {
   constructor(config) {
@@ -15,6 +19,7 @@ class ProxyServer {
         name: process.env.CERTBOT_WELL_KNOWN_NAME || null,
         contents: process.env.CERTBOT_WELL_KNOWN_CONTENTS || null
       },
+      proxyProtocol: boolean(process.env.PROXY_PROTOCOL || false),
       removeWwwPrefix: true,
       // useful option if you don't need https redirect
       // (e.g. it's just a certbot server)
@@ -52,7 +57,11 @@ class ProxyServer {
         res.end();
       });
 
-    this.server = http.createServer((req, res) => {
+    const createServer = this.config.proxyProtocol
+      ? proxiedHttp.createServer
+      : http.createServer;
+
+    this.server = createServer((req, res) => {
       router(req, res, finalhandler(req, res));
     });
 
