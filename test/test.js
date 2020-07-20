@@ -41,3 +41,19 @@ test('serves acme challenge', async t => {
   t.is(res.headers['content-type'], 'text/plain; charset=utf-8');
   t.is(res.text, config.certbot.contents);
 });
+
+test('redirects http to https and does not remove prefix', async t => {
+  const proxy = new ProxyServer({ removeWwwPrefix: false });
+  await proxy.listen();
+  const res = await request(proxy.server).get('/foobar');
+  const { port } = proxy.server.address();
+  t.is(res.status, 301);
+  t.is(res.headers.location, `https://127.0.0.1:${port}/foobar`);
+});
+
+test('starts and stops server with proxyProtocol = true', async t => {
+  const proxy = new ProxyServer({ proxyProtocol: true });
+  await proxy.listen();
+  await proxy.close();
+  t.pass();
+});
