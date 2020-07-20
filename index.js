@@ -37,32 +37,32 @@ class ProxyServer {
     )
       router.get(
         `/.well-known/acme-challenge/${this.config.certbot.name}`,
-        (req, res) => {
-          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-          res.end(this.config.certbot.contents);
+        (request, response) => {
+          response.setHeader('Content-Type', 'text/plain; charset=utf-8');
+          response.end(this.config.certbot.contents);
         }
       );
 
     if (this.config.redirect)
-      router.use((req, res) => {
+      router.use((request, response) => {
         if (this.config.removeWwwPrefix)
-          req.headers.host = req.headers.host.replace('www.', '');
-        res.writeHead(301, {
-          Location: parse(`https://${req.headers.host}${req.url}`).href
+          request.headers.host = request.headers.host.replace('www.', '');
+        response.writeHead(301, {
+          Location: parse(`https://${request.headers.host}${request.url}`).href
         });
-        res.end();
+        response.end();
       });
     else
-      router.use((req, res) => {
-        res.end();
+      router.use((request, response) => {
+        response.end();
       });
 
     const createServer = this.config.proxyProtocol
       ? proxiedHttp.createServer
       : http.createServer;
 
-    this.server = createServer((req, res) => {
-      router(req, res, finalhandler(req, res));
+    this.server = createServer((request, response) => {
+      router(request, response, finalhandler(request, response));
     });
 
     // bind listen/close to this
