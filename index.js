@@ -8,8 +8,6 @@ const parse = require('url-parse');
 const proxyWrap = require('findhit-proxywrap');
 const { boolean } = require('boolean');
 
-const proxiedHttp = proxyWrap.proxy(http);
-
 class ProxyServer {
   constructor(config) {
     this.config = {
@@ -24,9 +22,12 @@ class ProxyServer {
       // useful option if you don't need https redirect
       // (e.g. it's just a certbot server)
       redirect: true,
+      // <https://github.com/cusspvz/proxywrap>
+      proxyOptions: {},
       ...config
     };
 
+    const proxiedHttp = proxyWrap.proxy(http, this.config.proxyOptions);
     const router = new Router();
 
     // support for lets encrypt verification
