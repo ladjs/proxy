@@ -20,7 +20,7 @@
     "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)"
   ],
   "dependencies": {
-    "boolean": "^3.1.4",
+    "boolean": "^3.2.0",
     "finalhandler": "^1.1.2",
     "findhit-proxywrap": "^0.3.12",
     "lodash": "^4.17.21",
