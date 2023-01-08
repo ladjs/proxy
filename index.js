@@ -59,7 +59,7 @@ class ProxyServer {
         // X-Robots-Tag
         // <https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag>
         response.writeHead(200, {
-          'X-Robots-Tag': 'noindex'
+          'X-Robots-Tag': 'none'
         });
         response.end('OK');
       });
