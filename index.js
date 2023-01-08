@@ -56,7 +56,12 @@ class ProxyServer {
       });
     else
       router.use((request, response) => {
-        response.end();
+        // X-Robots-Tag
+        // <https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag>
+        response.writeHead(200, {
+          'X-Robots-Tag': 'noindex'
+        });
+        response.end('OK');
       });
 
     const createServer = this.config.proxyProtocol
