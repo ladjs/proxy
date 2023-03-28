@@ -13,7 +13,8 @@ class ProxyServer {
   constructor(config) {
     this.config = {
       logger: console,
-      port: process.env.PROXY_PORT || null,
+      port: process.env.PROXY_PORT || 0,
+      serverHost: process.env.PROXY_HOST || '::',
       certbot: {
         name: process.env.CERTBOT_WELL_KNOWN_NAME || null,
         contents: process.env.CERTBOT_WELL_KNOWN_CONTENTS || null
@@ -77,8 +78,16 @@ class ProxyServer {
     this.close = this.close.bind(this);
   }
 
-  async listen(port) {
-    await util.promisify(this.server.listen).bind(this.server)(port);
+  async listen(
+    port = this.config.port,
+    host = this.config.serverHost,
+    ...args
+  ) {
+    await util.promisify(this.server.listen).bind(this.server)(
+      port,
+      host,
+      ...args
+    );
   }
 
   async close() {
