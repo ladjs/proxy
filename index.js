@@ -91,7 +91,7 @@ class ProxyServer {
   }
 
   async close() {
-    await util.promisify(this.server.close).bind(this.server);
+    await util.promisify(this.server.close).bind(this.server)();
   }
 }
 
