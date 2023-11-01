@@ -1,6 +1,5 @@
 const test = require('ava');
 const request = require('supertest');
-
 const ProxyServer = require('..');
 
 test('starts and stops server', async (t) => {
