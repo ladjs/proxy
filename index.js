@@ -1,5 +1,6 @@
 const process = require('node:process');
 const http = require('node:http');
+const https = require('node:https');
 const util = require('node:util');
 const Router = require('router');
 const _ = require('lodash');
@@ -8,12 +9,20 @@ const parse = require('url-parse');
 const proxyWrap = require('findhit-proxywrap');
 const { boolean } = require('boolean');
 
+const router = new Router();
+
+function middleware(request, response) {
+  return router(request, response, finalhandler(request, response));
+}
+
 class ProxyServer {
   constructor(config) {
     this.config = {
       logger: console,
       port: process.env.PROXY_PORT || 0,
       serverHost: process.env.PROXY_HOST || '::',
+      protocol: process.env.PROXY_PROTOCOL || 'http',
+      ssl: {},
       certbot: {
         name: process.env.CERTBOT_WELL_KNOWN_NAME || null,
         contents: process.env.CERTBOT_WELL_KNOWN_CONTENTS || null
@@ -22,14 +31,16 @@ class ProxyServer {
       removeWwwPrefix: true,
       // useful option if you don't need https redirect
       // (e.g. it's just a certbot server)
-      redirect: true,
+      redirect:
+        typeof process.env.PROXY_REDIRECT === 'string'
+          ? process.env.PROXY_REDIRECT
+          : true,
       // <https://github.com/cusspvz/proxywrap>
       proxyOptions: {},
       ...config
     };
 
     const proxiedHttp = proxyWrap.proxy(http, this.config.proxyOptions);
-    const router = new Router();
 
     // support for lets encrypt verification
     if (
@@ -47,11 +58,19 @@ class ProxyServer {
 
     if (this.config.redirect)
       router.use((request, response) => {
-        if (this.config.removeWwwPrefix)
-          request.headers.host = request.headers.host.replace('www.', '');
-        response.writeHead(301, {
-          Location: parse(`https://${request.headers.host}${request.url}`).href
-        });
+        if (typeof this.config.redirect === 'string') {
+          response.writeHead(301, {
+            Location: this.config.redirect
+          });
+        } else {
+          if (this.config.removeWwwPrefix)
+            request.headers.host = request.headers.host.replace('www.', '');
+          response.writeHead(301, {
+            Location: parse(`https://${request.headers.host}${request.url}`)
+              .href
+          });
+        }
+
         response.end();
       });
     else
@@ -66,11 +85,14 @@ class ProxyServer {
 
     const createServer = this.config.proxyProtocol
       ? proxiedHttp.createServer
-      : http.createServer;
+      : this.config.protocol === 'https'
+        ? https.createServer
+        : http.createServer;
 
-    this.server = createServer((request, response) => {
-      router(request, response, finalhandler(request, response));
-    });
+    this.server =
+      this.config.protocol === 'https'
+        ? createServer(this.config.ssl, middleware)
+        : createServer(middleware);
 
     // bind listen/close to this
     this.listen = this.listen.bind(this);
