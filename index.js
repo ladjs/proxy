@@ -9,12 +9,6 @@ const parse = require('url-parse');
 const proxyWrap = require('findhit-proxywrap');
 const { boolean } = require('boolean');
 
-const router = new Router();
-
-function middleware(request, response) {
-  return router(request, response, finalhandler(request, response));
-}
-
 class ProxyServer {
   constructor(config) {
     this.config = {
@@ -39,6 +33,12 @@ class ProxyServer {
       proxyOptions: {},
       ...config
     };
+
+    const router = new Router();
+
+    function middleware(request, response) {
+      return router(request, response, finalhandler(request, response));
+    }
 
     const proxiedHttp = proxyWrap.proxy(http, this.config.proxyOptions);
 
